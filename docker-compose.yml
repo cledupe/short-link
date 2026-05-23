@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Cassandra cluster - 3 nodes for high availability and fault tolerance
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra
+    environment:
+      - CASSANDRA_CLUSTER_NAME=url_shortener
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+    # Scale to 3 nodes: docker-compose up --scale cassandra=3
+
+  # Redis cluster with cluster mode enabled for atomic counter operations and caching
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --cluster-enabled yes --appendonly yes --appendfsync everysec
+    volumes:
+      - redis_data:/data
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+
+  # Backend application - Node.js API server (scale to 3 instances)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    environment:
+      - PORT=3000
+      - CASSANDRA_NODES=cassandra
+      - REDIS_URL=redis://redis:6379
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+    # Scale to 3 instances: docker-compose up --scale backend=3
+
+  # Nginx load balancer for distributing traffic to backend instances
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    networks:
+      - url_shortener_net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Frontend Vue.js SPA
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+
+networks:
+  url_shortener_net:
+    driver: bridge
+
+volumes:
+  cassandra_data:
+    driver: local
+  redis_data:
+    driver: local
