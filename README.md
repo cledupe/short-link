@@ -121,6 +121,8 @@ PORT=3000
 See the `docs/` directory for detailed documentation:
 
 - [Security Configuration](docs/security.md) — Port mappings, firewall rules, security groups, network isolation
+- [Cassandra Backup & Restore](docs/cassandra-backup.md) — Snapshot procedures, incremental strategy, automated backup/restore scripts
+- [Cassandra CQL Queries](docs/cassandra-queries.md) — Complete CQL reference with INSERT, SELECT, UPDATE, BATCH, and time-range query examples
 
 ## Scaling
 
