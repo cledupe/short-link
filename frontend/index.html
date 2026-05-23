@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortener</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #app {
+      width: 100%;
+      max-width: 520px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    p.subtitle {
+      color: #6c757d;
+      text-align: center;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus {
+      border-color: #667eea;
+    }
+    .input-group input.error {
+      border-color: #e74c3c;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: #667eea;
+      color: #fff;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-success {
+      background: #2ecc71;
+      color: #fff;
+    }
+    .btn-success:hover { opacity: 0.9; }
+    .field-error {
+      color: #e74c3c;
+      font-size: 13px;
+      margin-bottom: 12px;
+      min-height: 20px;
+    }
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .result {
+      margin-top: 24px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #e9ecef;
+    }
+    .result-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6c757d;
+      margin-bottom: 8px;
+    }
+    .result-url {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2ecc71;
+      word-break: break-all;
+      margin-bottom: 12px;
+    }
+    .result-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .result-actions .btn { flex: 1; text-align: center; }
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+    .api-error {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .input-group { flex-direction: column; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="card">
+      <h1>✂️ URL Shortener</h1>
+      <p class="subtitle">Paste a long URL and make it short</p>
+
+      <div class="input-group">
+        <input
+          v-model="longUrl"
+          type="url"
+          placeholder="https://example.com/very/long/url"
+          :class="{ error: validationError }"
+          @keyup.enter="shortenUrl"
+        >
+        <button
+          class="btn btn-primary"
+          @click="shortenUrl"
+          :disabled="loading"
+        >
+          <span v-if="loading" class="spinner"></span>
+          {{ loading ? 'Shortening...' : 'Shorten' }}
+        </button>
+      </div>
+
+      <div class="field-error">{{ validationError }}</div>
+
+      <div v-if="apiError" class="api-error">{{ apiError }}</div>
+
+      <div v-if="shortUrl" class="result">
+        <div class="result-label">Shortened URL</div>
+        <div class="result-url">{{ shortUrl }}</div>
+        <div class="result-actions">
+          <button class="btn btn-success" @click="copyUrl">Copy to clipboard</button>
+          <button class="btn btn-primary" @click="reset">Shorten another</button>
+        </div>
+      </div>
+    </div>
+
+    <div :class="['toast', { show: toastVisible }]">{{ toastMessage }}</div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          longUrl: '',
+          shortUrl: '',
+          loading: false,
+          error: '',
+          validationError: '',
+          apiError: '',
+          toastVisible: false,
+          toastMessage: ''
+        };
+      },
+      methods: {
+        validateUrl(url) {
+          return /^https?:\/\/.+\..+/i.test(url.trim());
+        },
+        async shortenUrl() {
+          this.validationError = '';
+          this.apiError = '';
+          this.shortUrl = '';
+
+          const trimmed = this.longUrl.trim();
+          if (!trimmed) {
+            this.validationError = 'Please enter a URL';
+            return;
+          }
+          if (!this.validateUrl(trimmed)) {
+            this.validationError = 'Please enter a valid URL (http:// or https://)';
+            return;
+          }
+
+          this.loading = true;
+          try {
+            const res = await fetch('/api/v1/urls', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ original_url: trimmed })
+            });
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              throw new Error(err.error || `Server error (${res.status})`);
+            }
+            const data = await res.json();
+            this.shortUrl = data.short_url;
+          } catch (err) {
+            this.apiError = err.message || 'Failed to shorten URL. Please try again.';
+          } finally {
+            this.loading = false;
+          }
+        },
+        async copyUrl() {
+          try {
+            await navigator.clipboard.writeText(this.shortUrl);
+            this.showToast('Copied to clipboard!');
+          } catch {
+            this.showToast('Failed to copy');
+          }
+        },
+        reset() {
+          this.longUrl = '';
+          this.shortUrl = '';
+          this.validationError = '';
+          this.apiError = '';
+        },
+        showToast(msg) {
+          this.toastMessage = msg;
+          this.toastVisible = true;
+          setTimeout(() => { this.toastVisible = false; }, 2500);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

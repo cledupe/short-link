@@ -11,51 +11,51 @@
 - [x] 0.1.6 Document project structure in README.md
 
 ### 0.2 Docker Compose Definition
-- [ ] 0.2.1 Define `cassandra` service with 3 nodes using `--scale cassandra=3"
-- [ ] 0.2.2 Define `redis` service with cluster mode enabled
-- [ ] 0.2.3 Define `backend` service with 3 instances (scale parameter)
-- [ ] 0.2.4 Define `nginx` service for load balancing
-- [ ] 0.2.5 Define `frontend` service serving Vue.js SPA
-- [ ] 0.2.6 Configure inter-service networking with Docker bridges
-- [ ] 0.2.7 Set up volume mounts for persistence (Cassandra data, Redis data)
-- [ ] 0.2.8 Configure ports: 8080 for nginx (load balancer), 3000-3002 for backends
-- [ ] 0.2.9 Document all services and their ports in compose file comments
+- [x] 0.2.1 Define `cassandra` service with 3 nodes using `--scale cassandra=3"
+- [x] 0.2.2 Define `redis` service with cluster mode enabled
+- [x] 0.2.3 Define `backend` service with 3 instances (scale parameter)
+- [x] 0.2.4 Define `nginx` service for load balancing
+- [x] 0.2.5 Define `frontend` service serving Vue.js SPA (+ create frontend/Dockerfile)
+- [x] 0.2.6 Configure inter-service networking with Docker bridges
+- [x] 0.2.7 Set up volume mounts for persistence (Cassandra data, Redis data)
+- [x] 0.2.8 Configure ports: 8080 for nginx (load balancer), 3000-3002 for backends
+- [x] 0.2.9 Document all services and their ports in compose file comments
 
 ### 0.3 Backend Dockerfile  
-- [ ] 0.3.1 Use Node.js official image (node:18-alpine for small size)
-- [ ] 0.3.2 Copy package.json and package-lock.json
-- [ ] 0.3.3 Run `npm install --only=production`
-- [ ] 0.3.4 Copy application source code
-- [ ] 0.3.5 Set `EXPOSE 3000` for application port
-- [ ] 0.3.6 Use `CMD ["node", "server.js"]` to start server
-- [ ] 0.3.7 Optimize image size with multi-stage build (optional but recommended)
-- [ ] 0.3.8 Test Docker build: `docker build -t url-shortener-backend .`
+- [x] 0.3.1 Use Node.js official image (node:18-alpine for small size)
+- [x] 0.3.2 Copy package.json and package-lock.json
+- [x] 0.3.3 Run `npm install --only=production`
+- [x] 0.3.4 Copy application source code
+- [x] 0.3.5 Set `EXPOSE 3000` for application port
+- [x] 0.3.6 Use `CMD ["node", "server.js"]` to start server
+- [x] 0.3.7 Optimize image size with multi-stage build
+- [x] 0.3.8 Test Docker build: `docker build -t url-shortener-backend .`
 
 ### 0.4 Frontend Vue.js Implementation (spec: frontend-vue)
-- [ ] 0.4.1 Create `frontend/index.html` with basic HTML structure
-- [ ] 0.4.2 Include Vue.js from CDN: `<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js">`
-- [ ] 0.4.3 Create root div with id="app" for Vue mounting
-- [ ] 0.4.4 Create Vue component data properties: `longUrl`, `shortUrl`, `loading`, `error`
-- [ ] 0.4.5 Add v-model binding for URL input field
-- [ ] 0.4.6 Add @click handler for "Shorten URL" button
-- [ ] 0.4.7 Implement `shortenUrl()` method using fetch API to POST to `/api/v1/urls`
-- [ ] 0.4.8 Display loading spinner while API request in flight
-- [ ] 0.4.9 Display shortened URL in result section when successful
-- [ ] 0.4.10 Add "Copy to clipboard" button using `navigator.clipboard.writeText()`
-- [ ] 0.4.11 Handle errors from backend (display user-friendly message)
-- [ ] 0.4.12 Add client-side URL validation (basic regex)
-- [ ] 0.4.13 Add minimal CSS styling for responsive layout
-- [ ] 0.4.14 Test frontend: Open `index.html` in browser locally
+- [x] 0.4.1 Create `frontend/index.html` with basic HTML structure
+- [x] 0.4.2 Include Vue.js from CDN: `<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js">`
+- [x] 0.4.3 Create root div with id="app" for Vue mounting
+- [x] 0.4.4 Create Vue component data properties: `longUrl`, `shortUrl`, `loading`, `error`
+- [x] 0.4.5 Add v-model binding for URL input field
+- [x] 0.4.6 Add @click handler for "Shorten URL" button
+- [x] 0.4.7 Implement `shortenUrl()` method using fetch API to POST to `/api/v1/urls`
+- [x] 0.4.8 Display loading spinner while API request in flight
+- [x] 0.4.9 Display shortened URL in result section when successful
+- [x] 0.4.10 Add "Copy to clipboard" button using `navigator.clipboard.writeText()`
+- [x] 0.4.11 Handle errors from backend (display user-friendly message)
+- [x] 0.4.12 Add client-side URL validation (basic regex)
+- [x] 0.4.13 Add minimal CSS styling for responsive layout
+- [x] 0.4.14 Test frontend: Open `index.html` in browser locally
 
 ### 0.5 Nginx Configuration for Frontend
-- [ ] 0.5.1 Create `nginx.conf` in project root
-- [ ] 0.5.2 Configure `upstream backend` with 3 backend instances
-- [ ] 0.5.3 Configure `server` block to serve frontend at `/` root
-- [ ] 0.5.4 Configure `/api/` location to proxy_pass to backend upstream
-- [ ] 0.5.5 Serve static Vue.js frontend from `/frontend` directory
-- [ ] 0.5.6 Add CORS headers for API endpoints
-- [ ] 0.5.7 Configure proper MIME types for Vue.js files
-- [ ] 0.5.8 Test nginx configuration: `nginx -c nginx.conf -t`
+- [x] 0.5.1 Create `nginx.conf` in project root
+- [x] 0.5.2 Configure `upstream backend` with 3 backend instances
+- [x] 0.5.3 Configure `server` block to serve frontend at `/` root
+- [x] 0.5.4 Configure `/api/` location to proxy_pass to backend upstream
+- [x] 0.5.5 Serve static Vue.js frontend from `/frontend` directory
+- [x] 0.5.6 Add CORS headers for API endpoints
+- [x] 0.5.7 Configure proper MIME types for Vue.js files
+- [x] 0.5.8 Test nginx configuration: `nginx -c nginx.conf -t`
 
 ### 0.6 Docker Networking & Volumes
 - [ ] 0.6.1 Create Docker network `url_shortener_net` in compose file

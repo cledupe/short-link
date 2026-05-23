@@ -1,18 +1,14 @@
-FROM node:18-alpine
-
+# Stage 1: Install all dependencies
+FROM node:18-alpine AS builder
 WORKDIR /app
+COPY backend/package*.json ./
+RUN npm install
+COPY backend/ ./
 
-# Copy package files first for better caching
-COPY package*.json ./
-
-# Install production dependencies only
-RUN npm install --only=production
-
-# Copy application source code
-COPY . .
-
-# Expose application port
+# Stage 2: Production image
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app ./
 EXPOSE 3000
-
-# Start the application
 CMD ["node", "server.js"]

@@ -1,7 +1,9 @@
 version: '3.8'
 
 services:
-  # Cassandra cluster - 3 nodes for high availability and fault tolerance
+  # Cassandra cluster - NoSQL database for URL mapping storage
+  # Port: 9042 (internal, CQL native transport)
+  # Scale to 3 nodes: docker-compose up --scale cassandra=3
   cassandra:
     image: cassandra:4.1
     container_name: cassandra
@@ -10,30 +12,50 @@ services:
       - CASSANDRA_DC=datacenter1
       - CASSANDRA_RACK=rack1
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      # Seed nodes - Docker Compose DNS resolves service name to all container IPs
+      - CASSANDRA_SEEDS=cassandra
+      # Broadcast address uses Docker's dynamic hostname for cross-node communication
+      - CASSANDRA_BROADCAST_ADDRESS=$$(hostname -f)
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
-      - url_shortener_net
+      url_shortener_net:
+        aliases:
+          - cassandra-seed
     restart: unless-stopped
-    # Scale to 3 nodes: docker-compose up --scale cassandra=3
 
-  # Redis cluster with cluster mode enabled for atomic counter operations and caching
+  # Redis cluster - in-memory cache (TTL 24h) + atomic ID counter via INCR
+  # Port: 6379 (internal)
+  # Cluster mode enabled with AOF persistence for durability
   redis:
     image: redis:7-alpine
     container_name: redis
-    command: redis-server --cluster-enabled yes --appendonly yes --appendfsync everysec
+    command: redis-server --cluster-enabled yes --cluster-node-timeout 5000 --appendonly yes --appendfsync everysec
     volumes:
       - redis_data:/data
     networks:
-      - url_shortener_net
+      url_shortener_net:
+        aliases:
+          - redis-cluster
     restart: unless-stopped
 
-  # Backend application - Node.js API server (scale to 3 instances)
+  # Backend API - Node.js Express server handling URL creation and redirection
+  # Port: 3000 (internal, not exposed to host; nginx proxies requests)
+  # Scale to 3 instances: docker-compose up --scale backend=3
   backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: backend
+    depends_on:
+      - cassandra
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     environment:
       - PORT=3000
       - CASSANDRA_NODES=cassandra
@@ -45,9 +67,10 @@ services:
     networks:
       - url_shortener_net
     restart: unless-stopped
-    # Scale to 3 instances: docker-compose up --scale backend=3
 
-  # Nginx load balancer for distributing traffic to backend instances
+  # Nginx load balancer - entry point for all HTTP traffic
+  # Port: 8080 (exposed to host) -> proxies to backend:3000 (internal)
+  # Serves Vue.js SPA static assets + reverse-proxies /api/* to backend instances
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -62,15 +85,13 @@ services:
       - backend
     restart: unless-stopped
 
-  # Frontend Vue.js SPA
+  # Frontend - Vue.js SPA served via nginx:alpine
+  # Port: 80 (internal; assets served directly by nginx LB from mounted ./frontend)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     networks:
       - url_shortener_net
     restart: unless-stopped
