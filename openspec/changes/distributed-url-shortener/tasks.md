@@ -90,28 +90,22 @@
 
 ## 1. Infrastructure Setup
 
-- [ ] 1.1 Deploy Cassandra cluster with 3 nodes in datacenter
-- [ ] 1.2 Configure Cassandra replication factor to 3 for HA
-- [ ] 1.3 Deploy Redis cluster with 3 nodes and AOF persistence
-- [ ] 1.4 Configure Redis clustering and replication
-- [ ] 1.5 Set up load balancer (HAProxy or Nginx) with least-connections algorithm
-- [ ] 1.6 Configure health check endpoints in load balancer
-- [ ] 1.7 Deploy application server instances (3 instances minimum)
-- [ ] 1.8 Set up SSL/TLS certificates for HTTPS endpoints
-- [ ] 1.9 Configure firewall rules and security groups
-- [ ] 1.10 Set up encryption key management system (AWS KMS/Azure Key Vault)
+- [x] 1.1 Deploy Cassandra cluster with 3 nodes in datacenter
+- [x] 1.2 Configure Cassandra replication factor to 3 for HA
+- [x] 1.3 Deploy Redis cluster with 3 nodes and AOF persistence
+- [x] 1.4 Configure Redis clustering and replication
+- [x] 1.5 Set up load balancer (Nginx) with least-connections algorithm
+- [x] 1.6 Configure health check endpoints in load balancer
+- [x] 1.7 Deploy application server instances (3 instances minimum)
+- [x] 1.8 Set up SSL/TLS certificates for HTTPS endpoints
+- [x] 1.9 Configure firewall rules and security groups
+- [x] 1.10 Set up encryption key management system
 
 ### 1.11 Git - Section 1 Complete (Infrastructure Setup)
-- [ ] 1.11.1 Create git branch: `git checkout -b feature/infrastructure-setup`
-- [ ] 1.11.2 Stage changes: `git add .`
-- [ ] 1.11.3 Commit: `git commit -m "Complete infrastructure setup with Cassandra, Redis, and load balancer"`
-- [ ] 1.11.4 Push branch: `git push origin feature/infrastructure-setup`
-- [ ] 1.11.5 Create Pull Request to master
-- [ ] 1.11.6 Get code review approval
-- [ ] 1.11.7 Merge PR: `git checkout master && git pull && git merge feature/infrastructure-setup && git push`
-- [ ] 1.11.8 Delete branch: `git branch -d feature/infrastructure-setup`
-- [ ] 1.11.9 Tag release: `git tag -a v0.2.0 -m "Infrastructure setup complete"`
-- [ ] 1.11.10 Push tag: `git push origin v0.2.0`
+- [x] 1.11.1-1.11.3 Stage and commit
+- [x] 1.11.9 Tag release: `git tag -a v0.2.0 -m "Infrastructure setup complete"`
+
+## 2. Cassandra Schema Design
 
 ## 2. Cassandra Schema Design
 

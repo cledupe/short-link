@@ -48,6 +48,49 @@ services:
           - redis-cluster
     restart: unless-stopped
 
+  # ── Init Services ──────────────────────────────────────────────────
+
+  # Cassandra init - one-shot service that creates the keyspace after
+  # Cassandra cluster is ready. Runs cqlsh in a retry loop (up to 60s).
+  cassandra-init:
+    image: cassandra:4.1
+    depends_on:
+      - cassandra
+    volumes:
+      - ./scripts/init-cassandra.cql:/init.cql
+    networks:
+      - url_shortener_net
+    command: >
+      sh -c "
+        echo 'Waiting for Cassandra to be ready...' &&
+        for i in \$$(seq 1 30); do
+          if cqlsh cassandra 9042 -e 'describe cluster' 2>/dev/null; then
+            echo 'Cassandra is ready. Creating keyspace...' &&
+            cqlsh cassandra 9042 -f /init.cql &&
+            echo 'Keyspace created successfully.' &&
+            exit 0
+          fi
+          echo \"Waiting for Cassandra... attempt \$$i\" &&
+          sleep 2
+        done
+        echo 'Failed to connect to Cassandra after 30 attempts.' &&
+        exit 1
+      "
+    restart: "no"
+
+  # Redis cluster init - one-shot service that forms the 3-node Redis
+  # cluster. Waits for all nodes to respond to PING, then assigns slots.
+  redis-cluster-init:
+    image: redis:7-alpine
+    depends_on:
+      - redis
+    volumes:
+      - ./scripts/init-redis-cluster.sh:/scripts/init-redis-cluster.sh
+    networks:
+      - url_shortener_net
+    command: sh /scripts/init-redis-cluster.sh
+    restart: "no"
+
   # Backend API - Node.js Express server handling URL creation and redirection
   # Port: 3000 (internal, not exposed to host; nginx proxies requests)
   # Scale to 3 instances: docker-compose up --scale backend=3
@@ -57,8 +100,10 @@ services:
       dockerfile: Dockerfile
     container_name: backend
     depends_on:
-      - cassandra
-      - redis
+      cassandra-init:
+        condition: service_completed_successfully
+      redis-cluster-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 15s

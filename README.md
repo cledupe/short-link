@@ -40,6 +40,25 @@ A high-performance, distributed URL shortening service built with Docker, Cassan
 │   ├── App.vue             # Vue component
 │   └── ...                 # Frontend source files
 │
+├── docs/                   # Documentation
+│   ├── security.md         # Security configuration and best practices
+│   └── key-management.md   # Encryption key management guide
+│
+├── ssl/                    # SSL certificates (not committed)
+│   └── .gitkeep            # Ensures directory exists in repo
+│
+├── scripts/                # Utility scripts
+│   ├── verify-health.sh   # Health endpoint verification
+│   ├── deploy-scale.sh    # Deploy and scale backend instances
+│   ├── test-local.sh       # Local integration test suite
+│   ├── test-local.bat      # Local test suite (Windows)
+│   └── generate-ssl-certs.sh  # Self-signed SSL cert generator
+│
+├── nginx.conf              # Nginx config (HTTP)
+├── nginx-ssl.conf          # Nginx config (HTTPS with TLS)
+├── docker-compose.yml      # Base Docker Compose configuration
+├── docker-compose.ssl.yml  # Docker Compose SSL override
+│
 └── openspec/               # OpenSpec change tracking
     └── changes/
         └── distributed-url-shortener/
@@ -99,6 +118,17 @@ PORT=3000
 | `CASSANDRA_NODES`| Cassandra node addresses                   | `cassandra`                   |
 | `REDIS_URL`      | Redis connection URL                       | `redis://redis:6379`          |
 | `PORT`           | Backend server port                        | `3000`                        |
+
+## Documentation
+
+See the `docs/` directory for detailed documentation:
+
+- [Security Configuration](docs/security.md) — Port mappings, firewall rules, security groups, network isolation
+- [Key Management](docs/key-management.md) — Encryption key generation, rotation, KMS integration (AWS/Azure)
+
+## Scaling
+
+See [Scaling Guide](docs/scaling.md) for instructions on scaling backend instances, Cassandra nodes, and Redis cluster.
 
 ## API Endpoints
 

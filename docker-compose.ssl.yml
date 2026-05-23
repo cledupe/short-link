@@ -1,0 +1,18 @@
+version: '3.8'
+
+# Docker Compose override for SSL/TLS support
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.ssl.yml up -d
+#
+# Prerequisites:
+#   Run scripts/generate-ssl-certs.sh to generate self-signed certificates
+#   before starting with this override file.
+
+services:
+  nginx:
+    ports:
+      - "443:443"
+      - "8080:80"
+    volumes:
+      - ./nginx-ssl.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./frontend:/usr/share/nginx/html:ro
