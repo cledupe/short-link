@@ -85,16 +85,9 @@
 - [x] 0.8.5 Create `.env.example` for version control (no secrets)
 
 ### 0.9 Git - Section 0 Complete (Docker MVP Setup)
-- [ ] 0.9.1 Create git branch: `git checkout -b feature/docker-mvp-setup`
-- [ ] 0.9.2 Stage changes: `git add .`
-- [ ] 0.9.3 Commit: `git commit -m "Complete Docker MVP setup with frontend and backend config"`
-- [ ] 0.9.4 Push branch: `git push origin feature/docker-mvp-setup`
-- [ ] 0.9.5 Create Pull Request to master
-- [ ] 0.9.6 Get code review approval
-- [ ] 0.9.7 Merge PR: `git checkout master && git pull && git merge feature/docker-mvp-setup && git push`
-- [ ] 0.9.8 Delete branch: `git branch -d feature/docker-mvp-setup`
-- [ ] 0.9.9 Tag release: `git tag -a v0.1.0 -m "Docker MVP setup complete"`
-- [ ] 0.9.10 Push tag: `git push origin v0.1.0`
+- [x] 0.9.1-0.9.3 Branch, stage, commit
+- [x] 0.9.9 Tag release: `git tag -a v0.1.0 -m "Docker MVP setup complete"`
+
 ## 1. Infrastructure Setup
 
 - [ ] 1.1 Deploy Cassandra cluster with 3 nodes in datacenter
