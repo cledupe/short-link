@@ -110,12 +110,10 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    env_file: .env
     environment:
       - PORT=3000
       - CASSANDRA_NODES=cassandra
       - REDIS_URL=redis://redis:6379
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     volumes:
       - ./backend:/app
       - /app/node_modules

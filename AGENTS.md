@@ -34,7 +34,6 @@ High-performance, distributed URL shortening service built with Node.js, Cassand
 - Nginx configuration (nginx.conf)
 - Cassandra schema (keyspace, tables)
 - Redis integration (cache + INCR counter)
-- Encryption service (AES-256-GCM)
 - Base62 encoding / distributed counter
 - Health checks and load balancer wiring
 
@@ -53,14 +52,13 @@ High-performance, distributed URL shortening service built with Node.js, Cassand
 ### Data Flow
 
 1. **Create URL:** `POST /api/v1/urls`
-   - Validate URL → Redis INCR (unique ID) → base62 encode → AES-256-GCM encrypt → Cassandra write → Redis cache
+   - Validate URL → Redis INCR (unique ID) → base62 encode → Cassandra write (original_url as plaintext) → Redis cache
 2. **Redirect:** `GET /:shortId`
-   - Redis cache lookup → (miss) Cassandra query → decrypt → 302 redirect → update visit_count
+   - Redis cache lookup → (miss) Cassandra query → 302 redirect → update visit_count
 
 ### Key Design Decisions
 
 - **Dual-purpose Redis:** cache for hot URLs AND atomic counter via `INCR`
-- **Encryption at rest:** all original URLs encrypted with AES-256-GCM + per-row IV
 - **No authentication:** simple public SPA; rate-limit by IP (100 req/min)
 - **Docker-first:** entire stack runnable locally via `docker-compose up --scale backend=3`
 
@@ -71,7 +69,6 @@ High-performance, distributed URL shortening service built with Node.js, Cassand
 - **Database:** Cassandra 4.1 (GossipingPropertyFileSnitch)
 - **Cache/Counter:** Redis 7 (cluster mode, AOF)
 - **Load Balancer:** Nginx (least-connections)
-- **Crypto:** Node.js `crypto` (AES-256-GCM)
 - **Ops:** Docker, Docker Compose, Prometheus, Grafana (future)
 
 ## Project Structure
@@ -94,7 +91,6 @@ High-performance, distributed URL shortening service built with Node.js, Cassand
 
 ## Development Notes
 
-- Use `.env` for `ENCRYPTION_KEY` (32 chars); never commit secrets
 - Scale backend: `docker-compose up --scale backend=3`
 - Scale Cassandra: `docker-compose up --scale cassandra=3`
 - All services attach to `url_shortener_net` bridge network

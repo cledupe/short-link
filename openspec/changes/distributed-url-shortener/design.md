@@ -5,7 +5,7 @@ This design implements a distributed URL shortening service built for high avail
 **Key Constraints:**
 - Must support horizontal scaling for both read and write operations
 - Must maintain 99.9% uptime with 3-node Cassandra cluster
-- Must encrypt all stored URLs for data protection compliance
+- Must store URLs in Cassandra for persistence and replication
 - Must generate unique short URLs without collisions under concurrent load
 - Must cache frequently accessed URLs to reduce database load
 
@@ -21,7 +21,7 @@ This design implements a distributed URL shortening service built for high avail
 - Provide sub-10ms response time for cached URL lookups
 - Maintain 99.9% availability through redundancy and failover
 - Support 10k+ requests per second throughput
-- Encrypt all stored URLs with AES-256-GCM
+- Store all URLs as plaintext in Cassandra
 - Generate collision-free short URLs using atomic counters
 - Cache hot URLs in Redis to reduce Cassandra load
 - Distribute traffic evenly across application instances
@@ -82,22 +82,23 @@ This design implements a distributed URL shortening service built for high avail
 - UUID/random strings: No coordination needed but longer URLs, collision probability increases
 - Hash of original URL: Deterministic but potential collisions, no ordering
 
-**Trade-off:** Sequential IDs can reveal creation volume (information leakage). Mitigated by encryption and not exposing ID sequence directly.
+**Trade-off:** Sequential IDs can reveal creation volume (information leakage). Mitigated by not exposing ID sequence directly.
 
-### 4. **Encryption: AES-256-GCM vs ChaCha20-Poly1305**
-**Decision:** Use AES-256-GCM with key rotation
+### 4. **URL Storage: Plaintext vs Encryption**
+**Decision:** Store URLs as plaintext in Cassandra
 
 **Rationale:**
-- AES-256 is industry standard, hardware-accelerated on modern CPUs (good performance)
-- GCM mode provides authenticated encryption (detects tampering)
-- Wide library support across languages
-- Regulatory compliance requirements often specify AES
+- Eliminates encryption/decryption latency overhead (~2-5ms per operation)
+- Removes key management complexity (key generation, rotation, storage)
+- Simpler architecture with fewer failure modes
+- For MVP, encryption adds complexity without immediate benefit
+- Can be added later if compliance requirements arise
 
 **Alternatives considered:**
-- ChaCha20-Poly1305: Better performance on non-hardware-accelerated platforms, but less industry adoption
-- Fernet (AES128-CBC + HMAC): Simpler API but less performant and uses older CBC mode
+- AES-256-GCM: Industry standard but adds latency and key management overhead
+- ChaCha20-Poly1305: Better performance but similar complexity trade-offs
 
-**Trade-off:** Key management complexity - need secure key storage, rotation logic, and retention of old keys for decryption.
+**Trade-off:** URLs are stored in plaintext. If compliance requirements change, encryption can be added at the application layer without schema changes.
 
 ### 5. **Load Balancing Algorithm**
 **Decision:** Use least connections with health checks
@@ -131,9 +132,8 @@ This design implements a distributed URL shortening service built for high avail
 - **Scenario:** Uneven distribution of popular URLs could create hot partitions, impacting performance
 → **Mitigation:** Use Murmur3Partitioner for even distribution. Design queries around partition key (shortId). Monitor node load distribution. Consider using LeveledCompactionStrategy for write-heavy workload.
 
-**[Risk 5] Encryption key compromise**
-- **Scenario:** Encryption keys exposed or compromised, making all stored URLs decryptable
-→ **Mitigation:** Use hardware security module (HSM) or cloud KMS (AWS KMS, Azure Key Vault) for key storage. Implement strict access controls. Enable audit logging for all key access. Implement emergency key rotation procedures.
+**[Risk 5] (Removed - no encryption)**
+- URLs stored as plaintext; encryption risk eliminated
 
 **[Trade-off 1] Consistency vs Availability**
 - Cassandra's eventual consistency model provides higher availability but may return slightly stale data
@@ -143,9 +143,8 @@ This design implements a distributed URL shortening service built for high avail
 - Large cache reduces database load but increases Redis memory costs
 - **Decision:** Start with 24-hour TTL and LRU eviction for URLs accessed in last 30 days. Monitor cache hit rate and adjust TTL based on usage patterns.
 
-**[Trade-off 3] Encryption overhead**
-- Encryption adds latency (~2-5ms) and CPU overhead to every read/write
-- **Decision:** Accept overhead for security requirements. AES-256-GCM with hardware acceleration keeps overhead minimal. Benchmark performance under load to validate impact.
+**[Trade-off 3] (Removed - no encryption overhead)**
+- Encryption overhead eliminated since URLs stored as plaintext
 
 ## Load Balancer Recommendation for MVP
 
@@ -274,7 +273,6 @@ docker-compose.yml
 - Deploy Redis cluster (3 nodes with replication)
 - Deploy application instances (2-3 for initial load balancing)
 - Configure load balancer with health checks
-- Set up encryption keys in secure storage
 
 **Phase 2: Application Deployment** (1 week)
 - Deploy URL creation service with feature flag disabled
@@ -288,14 +286,12 @@ docker-compose.yml
 - Monitor performance metrics: latency, error rates, cache hit rates
 - Gradually increase traffic to 25%, 50%, 100%
 - Enable URL redirection for existing shortened URLs
-- Verify encryption/decryption working correctly
 - Validate load balancing distribution
 
 **Phase 4: Validation and Optimization** (ongoing)
 - Monitor Cassandra and Redis cluster health
 - Tune cache TTL based on access patterns
 - Adjust load balancer algorithms if needed
-- Optimize encryption performance
 - Scale infrastructure based on actual usage
 
 **Rollback Strategy:**
@@ -310,7 +306,7 @@ docker-compose.yml
 
 2. **Analytics granularity:** What level of analytics data should we capture? (per-URL, per-user, temporal analysis)
 
-3. **Encryption key lifecycle:** Should we implement automatic key rotation every 90 days with zero-downtime, or require manual rotation?
+3. **Cassandra compaction strategy:** Given write-heavy workload with occasional reads, should we optimize for write throughput or read performance initially?
 
 4. **Rate limiting scope:** Should rate limits be per-IP, per-user, per-API key, or a combination? What are sensible default limits?
 

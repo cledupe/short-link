@@ -107,10 +107,8 @@
 
 ## 2. Cassandra Schema Design
 
-## 2. Cassandra Schema Design
-
-- [ ] 2.1 Create Cassandra keyspace for URL mappings with replication_factor=3
-- [ ] 2.2 Design and create `url_mappings` table with columns: short_id, original_url_encrypted, iv, created_at, visit_count
+- [x] 2.1 Create Cassandra keyspace for URL mappings with replication_factor=3
+- [x] 2.2 Design and create `url_mappings` table with columns: short_id, original_url, created_at, visit_count
 - [ ] 2.3 Design and create `url_metadata` table with columns: short_id, creator_ip, user_agent, created_at
 - [ ] 2.4 Create materialized views or secondary indexes for analytics queries
 - [ ] 2.5 Configure Cassandra compaction strategy to LeveledCompactionStrategy
@@ -135,8 +133,8 @@
 - [ ] 3.2 Implement URL validation (format, scheme, etc.)
 - [ ] 3.3 Integrate distributed counter to get next ID from Redis
 - [ ] 3.4 Implement base62 encoding function (0-9a-zA-Z)
-- [ ] 3.5 Integrate encryption service to encrypt original URL (AES-256-GCM)
-- [ ] 3.6 Store encrypted URL and IV in Cassandra `url_mappings` table
+- [ ] 3.5 Store original URL directly in Cassandra (no encryption)
+- [ ] 3.6 Store original_url in Cassandra `url_mappings` table
 - [ ] 3.7 Store metadata (IP, user agent, timestamp) in `url_metadata` table
 - [ ] 3.8 Implement duplicate URL detection (check Cassandra before creating)
 - [ ] 3.9 Return JSON response with short URL and 201 Created status
@@ -148,7 +146,7 @@
 ### 3.14 Git - Section 3 Complete (URL Creation Service)
 - [ ] 3.14.1 Create git branch: `git checkout -b feature/url-creation-service`
 - [ ] 3.14.2 Stage changes: `git add .`
-- [ ] 3.14.3 Commit: `git commit -m "Complete URL creation service with Redis counter and encryption"`
+- [ ] 3.14.3 Commit: `git commit -m "Complete URL creation service with Redis counter and plaintext storage"`
 - [ ] 3.14.4 Push branch: `git push origin feature/url-creation-service`
 - [ ] 3.14.5 Create Pull Request to master
 - [ ] 3.14.6 Get code review approval
@@ -163,7 +161,7 @@
 - [ ] 4.2 Implement Redis cache lookup first (check if mapping exists in cache)
 - [ ] 4.3 On cache miss, query Cassandra `url_mappings` table for the short_id
 - [ ] 4.4 Store retrieved mapping in Redis cache with 24-hour TTL
-- [ ] 4.5 Decrypt original_url using encryption service (AES-256-GCM)
+- [ ] 4.5 Read original_url directly from Cassandra (no decryption needed)
 - [ ] 4.6 Return 302 redirect response with decrypted URL in Location header
 - [ ] 4.7 Return 404 Not Found for non-existent short_ids
 - [ ] 4.8 Increment visit_count in Cassandra (counter column)
@@ -207,31 +205,20 @@
 - [ ] 5.10.9 Tag release: `git tag -a v0.6.0 -m "Distributed counter complete"`
 - [ ] 5.10.10 Push tag: `git push origin v0.6.0`
 
-## 6. Encryption Service (spec: encryption-service)
+## 6. Encryption Service (REMOVED)
 
-- [ ] 6.1 Implement AES-256-GCM encryption for URL storage
-- [ ] 6.2 Generate unique 96-bit (12-byte) IV for each encryption operation
-- [ ] 6.3 Use cryptographically secure random number generator (CSPRNG) for IV
-- [ ] 6.4 Integrate with key management system (AWS KMS/Azure Key Vault)
-- [ ] 6.5 Implement encryption key retrieval and caching logic
-- [ ] 6.6 Create encryption/decryption functions with automatic IV handling
-- [ ] 6.7 Implement encryption timing-attack resistance
-- [ ] 6.8 Implement key rotation (90 days automated)
-- [ ] 6.9 Retain old keys for decrypting existing data
-- [ ] 6.10 Log decryption failures as security events
-- [ ] 6.11 Implement alert for multiple decryption failures from same source
-- [ ] 6.12 Test encryption/decryption performance (1000 concurrent ops)
+Encryption at rest was removed from the project scope. URLs are stored as plaintext in Cassandra.
 
-### 6.13 Git - Section 6 Complete (Encryption Service)
+### 6.13 Git - Section 6 Complete (Encryption Service - REMOVED)
 - [ ] 6.13.1 Create git branch: `git checkout -b feature/encryption-service`
 - [ ] 6.13.2 Stage changes: `git add .`
-- [ ] 6.13.3 Commit: `git commit -m "Complete encryption service with AES-256-GCM"`
+- [ ] 6.13.3 Commit: `git commit -m "Remove encryption service - URLs stored as plaintext"`
 - [ ] 6.13.4 Push branch: `git push origin feature/encryption-service`
 - [ ] 6.13.5 Create Pull Request to master
 - [ ] 6.13.6 Get code review approval
 - [ ] 6.13.7 Merge PR: `git checkout master && git pull && git merge feature/encryption-service && git push`
 - [ ] 6.13.8 Delete branch: `git branch -d feature/encryption-service`
-- [ ] 6.13.9 Tag release: `git tag -a v0.7.0 -m "Encryption service complete"`
+- [ ] 6.13.9 Tag release: `git tag -a v0.7.0 -m "Encryption service removed"`
 - [ ] 6.13.10 Push tag: `git push origin v0.7.0`
 
 ## 7. Load Balancer Integration (spec: load-balancer)

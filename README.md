@@ -41,8 +41,7 @@ A high-performance, distributed URL shortening service built with Docker, Cassan
 │   └── ...                 # Frontend source files
 │
 ├── docs/                   # Documentation
-│   ├── security.md         # Security configuration and best practices
-│   └── key-management.md   # Encryption key management guide
+│   └── security.md         # Security configuration and best practices
 │
 ├── ssl/                    # SSL certificates (not committed)
 │   └── .gitkeep            # Ensures directory exists in repo
@@ -106,7 +105,6 @@ docker-compose down
 Create a `.env` file in the project root (see `.env.example`):
 
 ```env
-ENCRYPTION_KEY=your-32-character-encryption-key-here
 CASSANDRA_NODES=cassandra
 REDIS_URL=redis://redis:6379
 PORT=3000
@@ -114,7 +112,6 @@ PORT=3000
 
 | Variable         | Description                                | Default                       |
 |------------------|--------------------------------------------|-------------------------------|
-| `ENCRYPTION_KEY` | AES-256-GCM encryption key (32 characters) | (required, no default)        |
 | `CASSANDRA_NODES`| Cassandra node addresses                   | `cassandra`                   |
 | `REDIS_URL`      | Redis connection URL                       | `redis://redis:6379`          |
 | `PORT`           | Backend server port                        | `3000`                        |
@@ -124,7 +121,6 @@ PORT=3000
 See the `docs/` directory for detailed documentation:
 
 - [Security Configuration](docs/security.md) — Port mappings, firewall rules, security groups, network isolation
-- [Key Management](docs/key-management.md) — Encryption key generation, rotation, KMS integration (AWS/Azure)
 
 ## Scaling
 
