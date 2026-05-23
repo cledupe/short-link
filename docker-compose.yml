@@ -1,5 +1,14 @@
 version: '3.8'
 
+# ── Port Mappings (Host : Container) ──────────────────────────────
+#  nginx    :8080 → :80    (LB entry point; serves SPA + proxies /api/*)
+#  backend  :–     → :3000 (internal only; no host port exposed)
+#  cassandra:–     → :9042 (internal only; CQL native transport)
+#  redis    :–     → :6379 (internal only; in-memory cache + counter)
+#  frontend :–     → :80   (internal only; assets available through LB)
+# ── Test Networking ───────────────────────────────────────────────
+# docker exec nginx ping -c 2 backend
+
 services:
   # Cassandra cluster - NoSQL database for URL mapping storage
   # Port: 9042 (internal, CQL native transport)
@@ -56,6 +65,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+    env_file: .env
     environment:
       - PORT=3000
       - CASSANDRA_NODES=cassandra
@@ -92,6 +102,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
     networks:
       - url_shortener_net
     restart: unless-stopped

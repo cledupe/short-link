@@ -84,11 +84,21 @@ docker-compose down
 
 ### Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root (see `.env.example`):
 
 ```env
 ENCRYPTION_KEY=your-32-character-encryption-key-here
+CASSANDRA_NODES=cassandra
+REDIS_URL=redis://redis:6379
+PORT=3000
 ```
+
+| Variable         | Description                                | Default                       |
+|------------------|--------------------------------------------|-------------------------------|
+| `ENCRYPTION_KEY` | AES-256-GCM encryption key (32 characters) | (required, no default)        |
+| `CASSANDRA_NODES`| Cassandra node addresses                   | `cassandra`                   |
+| `REDIS_URL`      | Redis connection URL                       | `redis://redis:6379`          |
+| `PORT`           | Backend server port                        | `3000`                        |
 
 ## API Endpoints
 
@@ -99,3 +109,47 @@ ENCRYPTION_KEY=your-32-character-encryption-key-here
 ## License
 
 MIT
+
+## Testing
+
+Run the local test suite to validate the entire stack:
+
+### Prerequisites
+
+- Docker and Docker Compose must be installed
+- Ports 8080 (Nginx) and 3000-3002 (Backend) must be free
+
+### Running Tests
+
+**Linux / macOS:**
+```bash
+chmod +x scripts/test-local.sh
+./scripts/test-local.sh
+```
+
+**Windows:**
+```batch
+scripts\test-local.bat
+```
+
+### Test Descriptions
+
+| Test | Section | Verifies |
+|------|---------|----------|
+| 0.7.1 | Container Startup | `docker-compose up` starts all services without errors |
+| 0.7.2 | Cassandra Cluster | Cassandra nodes discover each other and form a cluster |
+| 0.7.3 | Redis Connectivity | Backend instances can connect to Redis via `redis-cli ping` |
+| 0.7.4 | Backend Health | Backend `/health` endpoint confirms Cassandra + Redis are reachable |
+| 0.7.5 | Vue.js UI | `http://localhost:8080` returns HTTP 200 with the SPA |
+| 0.7.6 | End-to-End Flow | POST a URL → receive shortId → GET redirect resolves correctly |
+| 0.7.7 | Data Persistence | Stop/restart containers; previously created short URL still resolves |
+| 0.7.8 | Horizontal Scaling | `--scale backend=3` launches 3 instances; all report healthy |
+| 0.7.9 | Log Monitoring | `docker-compose logs -f` shows inter-service communication (manual) |
+
+### Expected Output
+
+All tests print `PASS` or `FAIL` for each section. A passing run ends with:
+
+```
+[PASS] All 0.7.x tests passed successfully
+```

@@ -58,31 +58,31 @@
 - [x] 0.5.8 Test nginx configuration: `nginx -c nginx.conf -t`
 
 ### 0.6 Docker Networking & Volumes
-- [ ] 0.6.1 Create Docker network `url_shortener_net` in compose file
-- [ ] 0.6.2 Attach all services to this network
-- [ ] 0.6.3 Create named volume `cassandra_data` for persistence
-- [ ] 0.6.4 Create named volume `redis_data` for persistence  
-- [ ] 0.6.5 Mount frontend files as volume for development (hot reload)
-- [ ] 0.6.6 Document port mappings: host-to-container
-- [ ] 0.6.7 Test container-to-container networking with ping
+- [x] 0.6.1 Create Docker network `url_shortener_net` in compose file
+- [x] 0.6.2 Attach all services to this network
+- [x] 0.6.3 Create named volume `cassandra_data` for persistence
+- [x] 0.6.4 Create named volume `redis_data` for persistence  
+- [x] 0.6.5 Mount frontend files as volume for development (hot reload)
+- [x] 0.6.6 Document port mappings: host-to-container
+- [x] 0.6.7 Test container-to-container networking with ping
 
 ### 0.7 Local Testing & Simulation
-- [ ] 0.7.1 Run `docker-compose up` and verify all containers start
-- [ ] 0.7.2 Verify Cassandra nodes can communicate and form cluster
-- [ ] 0.7.3 Verify Redis accepts connections from backend instances
-- [ ] 0.7.4 Test backend instances can reach Cassandra and Redis
-- [ ] 0.7.5 Access `http://localhost:8080` and see Vue.js UI
-- [ ] 0.7.6 Paste URL and verify entire flow works end-to-end
-- [ ] 0.7.7 Test Cassandra persistence: stop containers, restart, verify data still exists
-- [ ] 0.7.8 Test scaling: `docker-compose up --scale backend=3` (verify load balancing)
-- [ ] 0.7.9 Monitor logs: `docker-compose logs -f` to check inter-service communication
+- [x] 0.7.1 Run `docker-compose up` and verify all containers start
+- [x] 0.7.2 Verify Cassandra nodes can communicate and form cluster
+- [x] 0.7.3 Verify Redis accepts connections from backend instances
+- [x] 0.7.4 Test backend instances can reach Cassandra and Redis
+- [x] 0.7.5 Access `http://localhost:8080` and see Vue.js UI
+- [x] 0.7.6 Paste URL and verify entire flow works end-to-end
+- [x] 0.7.7 Test Cassandra persistence: stop containers, restart, verify data still exists
+- [x] 0.7.8 Test scaling: `docker-compose up --scale backend=3` (verify load balancing)
+- [x] 0.7.9 Monitor logs: `docker-compose logs -f` to check inter-service communication
 
 ### 0.8 Environment Configuration
-- [ ] 0.8.1 Create `.env` file for environment variables
-- [ ] 0.8.2 Define variables: CASSANDRA_NODES, REDIS_URL, ENCRYPTION_KEY
-- [ ] 0.8.3 Use `.env` file in docker-compose with `env_file` directive
-- [ ] 0.8.4 Document environment variables in README
-- [ ] 0.8.5 Create `.env.example` for version control (no secrets)
+- [x] 0.8.1 Create `.env` file for environment variables
+- [x] 0.8.2 Define variables: CASSANDRA_NODES, REDIS_URL, ENCRYPTION_KEY
+- [x] 0.8.3 Use `.env` file in docker-compose with `env_file` directive
+- [x] 0.8.4 Document environment variables in README
+- [x] 0.8.5 Create `.env.example` for version control (no secrets)
 
 ### 0.9 Git - Section 0 Complete (Docker MVP Setup)
 - [ ] 0.9.1 Create git branch: `git checkout -b feature/docker-mvp-setup`
