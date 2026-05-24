@@ -121,19 +121,19 @@
 
 ## 3. Core - URL Creation Service (spec: url-creation)
 
-- [ ] 3.1 Create `/api/v1/urls` POST endpoint accepting JSON with original_url field
-- [ ] 3.2 Implement URL validation (format, scheme, etc.)
-- [ ] 3.3 Integrate distributed counter to get next ID from Redis
-- [ ] 3.4 Implement base62 encoding function (0-9a-zA-Z)
-- [ ] 3.5 Store original URL directly in Cassandra (no encryption)
-- [ ] 3.6 Store original_url in Cassandra `url_mappings` table
-- [ ] 3.7 Store metadata (IP, user agent, timestamp) in `url_metadata` table
-- [ ] 3.8 Implement duplicate URL detection (check Cassandra before creating)
-- [ ] 3.9 Return JSON response with short URL and 201 Created status
-- [ ] 3.10 Return existing short URL with 200 OK for duplicates
-- [ ] 3.11 Implement rate limiting (100 requests/min per IP)
-- [ ] 3.12 Create `/api/v1/urls/batch` POST endpoint for batch creation (max 100 URLs)
-- [ ] 3.13 Implement transaction handling for Cassandra writes (atomic operations)
+- [x] 3.1 Create `/api/v1/urls` POST endpoint accepting JSON with original_url field
+- [x] 3.2 Implement URL validation (format, scheme, etc.)
+- [x] 3.3 Integrate distributed counter to get next ID from Redis
+- [x] 3.4 Implement base62 encoding function (0-9a-zA-Z)
+- [x] 3.5 Store original URL directly in Cassandra (no encryption)
+- [x] 3.6 Store original_url in Cassandra `url_mappings` table
+- [x] 3.7 Store metadata (IP, user agent, timestamp) in `url_metadata` table
+- [x] 3.8 Implement duplicate URL detection (check Cassandra before creating)
+- [x] 3.9 Return JSON response with short URL and 201 Created status
+- [x] 3.10 Return existing short URL with 200 OK for duplicates
+- [x] 3.11 Implement rate limiting (100 requests/min per IP)
+- [x] 3.12 Create `/api/v1/urls/batch` POST endpoint for batch creation (max 100 URLs)
+- [x] 3.13 Implement transaction handling for Cassandra writes (atomic operations)
 
 ### 3.14 Git - Section 3 Complete (URL Creation Service)
 - [ ] 3.14.1 Create git branch: `git checkout -b feature/url-creation-service`

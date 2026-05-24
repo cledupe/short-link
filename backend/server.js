@@ -1,10 +1,11 @@
 const express = require('express');
 const healthRouter = require('./src/routes/health');
+const urlsRouter = require('./src/routes/urls');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -15,6 +16,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', healthRouter);
+app.use('/api/v1/urls', urlsRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {

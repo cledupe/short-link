@@ -1,3 +1,4 @@
 const healthRouter = require('./health');
+const urlsRouter = require('./urls');
 
-module.exports = { healthRouter };
+module.exports = { healthRouter, urlsRouter };
