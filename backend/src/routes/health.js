@@ -33,7 +33,6 @@ async function checkCassandra(timeout) {
       localDataCenter: 'datacenter1',
       protocolOptions: { port: 9042 },
       socketOptions: { connectTimeout: timeout, readTimeout: timeout },
-      policies: { retry: new cassandra.policies.retry.NoRetryPolicy() },
     });
     await client.connect();
     await client.execute('SELECT release_version FROM system.local');
@@ -45,7 +44,7 @@ async function checkCassandra(timeout) {
 }
 
 router.get('/', async (req, res) => {
-  const TIMEOUT = 500;
+  const TIMEOUT = 2000;
   const [redisResult, cassandraResult] = await Promise.all([
     checkRedis(TIMEOUT),
     checkCassandra(TIMEOUT),
