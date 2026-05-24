@@ -175,27 +175,27 @@
 
 ## 5. Distributed Counter Implementation (spec: distributed-counter)
 
-- [ ] 5.1 Implement Redis INCR command wrapper for counter incrementation
-- [ ] 5.2 Implement Redis INCRBY for batch ID reservation
-- [ ] 5.3 Add error handling for Redis connection failures (circuit breaker pattern)
-- [ ] 5.4 Configure Redis persistence for counter durability
-- [ ] 5.5 Implement counter key naming strategy (`url:counter` for URLs)
-- [ ] 5.6 Create base62 encoding function converting integer → string (0-9a-zA-Z)
-- [ ] 5.7 Test ID uniqueness under concurrent load (1000 simultaneous increments)
-- [ ] 5.8 Implement counter recovery mechanism on Redis failover
-- [ ] 5.9 Monitor counter value and alert at 50%, 75%, 90% thresholds
+- [x] 5.1 Implement Redis INCR command wrapper for counter incrementation
+- [x] 5.2 Implement Redis INCRBY for batch ID reservation
+- [x] 5.3 Add error handling for Redis connection failures (circuit breaker pattern)
+- [x] 5.4 Configure Redis persistence for counter durability
+- [x] 5.5 Implement counter key naming strategy (`url:counter` for URLs)
+- [x] 5.6 Create base62 encoding function converting integer → string (0-9a-zA-Z)
+- [x] 5.7 Test ID uniqueness under concurrent load (1000 simultaneous increments)
+- [x] 5.8 Implement counter recovery mechanism on Redis failover
+- [x] 5.9 Monitor counter value and alert at 50%, 75%, 90% thresholds
 
 ### 5.10 Git - Section 5 Complete (Distributed Counter)
-- [ ] 5.10.1 Create git branch: `git checkout -b feature/distributed-counter`
-- [ ] 5.10.2 Stage changes: `git add .`
-- [ ] 5.10.3 Commit: `git commit -m "Complete distributed counter with Redis INCR"`
-- [ ] 5.10.4 Push branch: `git push origin feature/distributed-counter`
-- [ ] 5.10.5 Create Pull Request to master
-- [ ] 5.10.6 Get code review approval
-- [ ] 5.10.7 Merge PR: `git checkout master && git pull && git merge feature/distributed-counter && git push`
-- [ ] 5.10.8 Delete branch: `git branch -d feature/distributed-counter`
-- [ ] 5.10.9 Tag release: `git tag -a v0.6.0 -m "Distributed counter complete"`
-- [ ] 5.10.10 Push tag: `git push origin v0.6.0`
+- [x] 5.10.1 Create git branch: `git checkout -b feature/distributed-counter`
+- [x] 5.10.2 Stage changes: `git add .`
+- [x] 5.10.3 Commit: `git commit -m "Complete distributed counter with Redis INCR"`
+- [x] 5.10.4 Push branch: `git push origin feature/distributed-counter`
+- [x] 5.10.5 Create Pull Request to master
+- [x] 5.10.6 Get code review approval
+- [x] 5.10.7 Merge PR: `git checkout master && git pull && git merge feature/distributed-counter && git push`
+- [x] 5.10.8 Delete branch: `git branch -d feature/distributed-counter`
+- [x] 5.10.9 Tag release: `git tag -a v0.6.0 -m "Distributed counter complete"`
+- [x] 5.10.10 Push tag: `git push origin v0.6.0`
 
 ## 6. Encryption Service (REMOVED)
 
@@ -215,16 +215,16 @@ Encryption at rest was removed from the project scope. URLs are stored as plaint
 
 ## 7. Load Balancer Integration (spec: load-balancer)
 
-- [ ] 7.1 Implement `/health` endpoint returning 200 OK if all components healthy
-- [ ] 7.2 Add component health checks (Cassandra, Redis, encryption)
-- [ ] 7.3 Implement health check response within 500ms
-- [ ] 7.4 Implement `/ready` endpoint for Kubernetes readiness probes
-- [ ] 7.5 Configure load balancer health check interval (30 seconds)
-- [ ] 7.6 Configure load balancer with least-connections algorithm
-- [ ] 7.7 Test load balancer distribution under load (verify <10% variance)
-- [ ] 7.8 Test failover scenario (killing one instance, verify traffic stops)
-- [ ] 7.9 Test instance recovery (verify instance rejoins pool correctly)
-- [ ] 7.10 Configure connection pooling between LB and app instances
+- [x] 7.1 Implement `/health` endpoint returning 200 OK if all components healthy
+- [x] 7.2 Add component health checks (Cassandra, Redis, encryption)
+- [x] 7.3 Implement health check response within 500ms
+- [x] 7.4 Implement `/ready` endpoint for Kubernetes readiness probes
+- [x] 7.5 Configure load balancer health check interval (30 seconds)
+- [x] 7.6 Configure load balancer with least-connections algorithm
+- [x] 7.7 Test load balancer distribution under load (verify <10% variance)
+- [x] 7.8 Test failover scenario (killing one instance, verify traffic stops)
+- [x] 7.9 Test instance recovery (verify instance rejoins pool correctly)
+- [x] 7.10 Configure connection pooling between LB and app instances
 
 ### 7.11 Git - Section 7 Complete (Load Balancer Integration)
 - [ ] 7.11.1 Create git branch: `git checkout -b feature/load-balancer-integration`
