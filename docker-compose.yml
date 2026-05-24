@@ -64,7 +64,7 @@ services:
     command: >
       sh -c "
         echo 'Waiting for Cassandra to be ready...' &&
-        for i in \$$(seq 1 30); do
+        for i in \$$(seq 1 60); do
           if cqlsh cassandra 9042 -e 'describe cluster' 2>/dev/null; then
             echo 'Cassandra is ready. Creating keyspace...' &&
             cqlsh cassandra 9042 -f /init.cql &&
@@ -74,7 +74,8 @@ services:
           echo \"Waiting for Cassandra... attempt \$$i\" &&
           sleep 2
         done
-        echo 'Failed to connect to Cassandra after 30 attempts.' &&
+        echo 'Failed to connect to Cassandra after 60 attempts (120s).' &&
+        echo 'Check Cassandra logs: docker logs cassandra' &&
         exit 1
       "
     restart: "no"

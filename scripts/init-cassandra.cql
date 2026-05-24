@@ -1,5 +1,8 @@
+-- Dev: SimpleStrategy for single-node Docker
+-- Production: switch to NetworkTopologyStrategy with per-DC RF
+--   CREATE KEYSPACE url_shortener WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': 3};
 CREATE KEYSPACE IF NOT EXISTS url_shortener
-WITH replication = {'class': 'NetworkTopologyStrategy', 'datacenter1': 3};
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
 
 CREATE TABLE IF NOT EXISTS url_shortener.url_mappings (
     short_id TEXT PRIMARY KEY,
