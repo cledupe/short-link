@@ -1,9 +1,10 @@
 const express = require('express');
 const { getNextId, reserveIds } = require('../services/counter');
-const base62 = require('base62');
+const { encode } = require('base62');
 const cassandra = require('../services/cassandra');
 const cache = require('../services/cache');
 const { createRateLimiter, sanitizeUrl } = require('../middleware/security');
+const API_KEY = process.env.API_KEY;
 
 const router = express.Router();
 
@@ -176,18 +177,24 @@ router.delete('/:shortId', async (req, res) => {
     return res.status(400).json({ error: 'Invalid shortId.' });
   }
 
+  const apiKey = req.headers['x-api-key'];
+  if (API_KEY && apiKey !== API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   try {
     const mapping = await cassandra.findUrlByShortId(shortId);
     if (!mapping) {
       return res.status(404).json({ error: 'Short URL not found.' });
     }
 
+    await cassandra.deleteUrlMapping(shortId);
     await cache.del(shortId);
-    console.log(`[URLS] Cache invalidated for ${shortId}`);
+    console.log(`[URLS] Deleted ${shortId} from Cassandra and cache`);
 
-    return res.status(200).json({ short_id: shortId, message: 'Cache invalidated successfully.' });
+    return res.status(200).json({ short_id: shortId, message: 'Short URL deleted successfully.' });
   } catch (err) {
-    console.error(`[URLS] Error invalidating cache for ${shortId}:`, err.message);
+    console.error(`[URLS] Error deleting ${shortId}:`, err.message);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

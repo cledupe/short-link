@@ -28,14 +28,18 @@ High-performance, distributed URL shortening service built with Node.js, Cassand
 - OpenSpec proposal and 15-section task plan created
 - README with architecture diagram and quick-start guide
 
-**Not yet implemented:**
-- Backend source code (server.js, routes, models)
-- Frontend Vue.js components
-- Nginx configuration (nginx.conf)
-- Cassandra schema (keyspace, tables)
-- Redis integration (cache + INCR counter)
-- Base62 encoding / distributed counter
-- Health checks and load balancer wiring
+**Implemented:**
+- Backend source code (server.js, routes, services, middleware)
+- Frontend Vue.js SPA (index.html)
+- Nginx load balancer configuration (nginx.conf + nginx-ssl.conf)
+- Cassandra schema (keyspace, tables, indexes in init-cassandra.cql)
+- Redis integration (cache + INCR counter via ioredis)
+- Base62 encoding (via npm base62 package)
+- Health checks, readiness probes, and load balancer wiring
+- Prometheus metrics + Grafana monitoring
+- Rate limiting, CORS, security headers, WAF rules
+- E2E tests, load tests, cache hit rate tests
+- Full documentation (API, deployment, runbooks, scaling, backup)
 
 ## Target Architecture
 

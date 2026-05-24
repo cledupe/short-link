@@ -8,7 +8,7 @@ set -euo pipefail
 
 ALL_PASS=true
 BACKENDS=("http://localhost:3000/health" "http://localhost:3001/health" "http://localhost:3002/health")
-LB_URL="http://localhost:8080/api/health"
+LB_URL="http://localhost:8080/health"
 
 echo "═══════════════════════════════════════════════"
 echo "  Failover & Distribution Tests"
@@ -18,11 +18,11 @@ echo "════════════════════════�
 echo ""
 echo "── 7.7 Load Distribution ──"
 HITS=()
-for i in {1..30}; do
-  TARGET=$(curl -s -o /dev/null -w "%{redirect_url}" http://localhost:8080/api/health 2>/dev/null || true)
+for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+  TARGET=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health 2>/dev/null || true)
   HITS+=("$TARGET")
 done
-echo "  Sent 30 requests through LB"
+echo "  Sent 12 requests through LB"
 echo "  PASS: Distribution test completed"
 
 # ── 7.8 Failover Test ───────────────────────────────

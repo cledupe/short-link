@@ -39,7 +39,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: redis
-    command: redis-server --cluster-enabled yes --cluster-node-timeout 5000 --appendonly yes --appendfsync everysec --maxmemory 256mb --maxmemory-policy allkeys-lru
+    command: redis-server --appendonly yes --appendfsync everysec --maxmemory 256mb --maxmemory-policy allkeys-lru
+    # For multi-node cluster mode: add --cluster-enabled yes --cluster-node-timeout 5000 and deploy 3+ nodes
     volumes:
       - redis_data:/data
     networks:
@@ -132,21 +133,6 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/usr/share/nginx/html:ro
-    networks:
-      - url_shortener_net
-    depends_on:
-      - backend
-    restart: unless-stopped
-
-  # Frontend - Vue.js SPA served via nginx:alpine
-  # Port: 80 (internal; assets served directly by nginx LB from mounted ./frontend)
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    volumes:
-      - ./frontend:/usr/share/nginx/html
     networks:
       - url_shortener_net
     restart: unless-stopped

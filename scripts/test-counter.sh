@@ -3,6 +3,13 @@ set -e
 
 REDIS_URL="${REDIS_URL:-redis://localhost:6379}"
 
+# Check if Redis is accessible
+if ! redis-cli -u "$REDIS_URL" ping 2>/dev/null; then
+  echo "Redis not accessible at $REDIS_URL"
+  echo "Set REDIS_URL env var or start Docker services"
+  exit 1
+fi
+
 echo "=== Distributed Counter Test ==="
 echo "Redis URL: $REDIS_URL"
 

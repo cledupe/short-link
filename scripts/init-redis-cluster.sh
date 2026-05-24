@@ -16,6 +16,14 @@
 
 set -e
 
+# Check if Redis cluster mode is enabled - skip if single node
+NUM_NODES=$(redis-cli -h redis -p 6379 CLUSTER NODES 2>/dev/null | wc -l)
+if [ "$NUM_NODES" -lt 3 ]; then
+  echo "Redis cluster requires 3+ nodes. Current nodes: $NUM_NODES"
+  echo "Skipping cluster creation. Start with: docker-compose up --scale redis=3"
+  exit 0
+fi
+
 # Resolve all unique Redis container IPs via Docker DNS
 # When scaling with --scale redis=3, "redis" resolves to all 3 container IPs
 REDIS_PORT=6379

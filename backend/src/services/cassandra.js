@@ -62,7 +62,7 @@ async function findUrlByOriginalUrl(originalUrl) {
 async function insertUrlMapping(shortId, originalUrl) {
   const start = Date.now();
   await getClient().execute(
-    'INSERT INTO url_mappings (short_id, original_url, created_at, visit_count) VALUES (?, ?, ?, 0)',
+    'INSERT INTO url_mappings (short_id, original_url, created_at) VALUES (?, ?, ?)',
     [shortId, originalUrl, new Date()],
     { prepare: true }
   );
@@ -77,6 +77,26 @@ async function insertUrlMetadata(shortId, ip, userAgent) {
     { prepare: true }
   );
   observeCassandraQuery('insert_url_metadata', Date.now() - start);
+}
+
+async function createVisitCountRecord(shortId) {
+  const start = Date.now();
+  await getClient().execute(
+    'UPDATE url_mappings SET visit_count = visit_count + 0 WHERE short_id = ?',
+    [shortId],
+    { prepare: true }
+  );
+  observeCassandraQuery('create_visit_count', Date.now() - start);
+}
+
+async function deleteUrlMapping(shortId) {
+  const start = Date.now();
+  await getClient().execute(
+    'DELETE FROM url_mappings WHERE short_id = ?',
+    [shortId],
+    { prepare: true }
+  );
+  observeCassandraQuery('delete_url_mapping', Date.now() - start);
 }
 
 async function incrementVisitCount(shortId) {
@@ -116,6 +136,8 @@ module.exports = {
   findUrlByShortId,
   findUrlByOriginalUrl,
   insertUrlMapping,
+  createVisitCountRecord,
+  deleteUrlMapping,
   insertUrlMetadata,
   incrementVisitCount,
   storeVisitAnalytics,

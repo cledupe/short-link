@@ -5,3 +5,5 @@ scrape_configs:
   - job_name: 'backend'
     static_configs:
       - targets: ['backend:3000']
+    # When scaled to 3 instances, targets will be DNS-resolved
+    # to all backend container IPs automatically
