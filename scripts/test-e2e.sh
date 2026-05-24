@@ -50,7 +50,7 @@ test "Redis responds" sh -c "
   docker-compose exec -T redis redis-cli ping 2>/dev/null | grep -q PONG
 "
 test "Cassandra accessible via backend" sh -c "
-  docker-compose exec -T backend curl -s http://localhost:3000/health 2>/dev/null | grep -q ok
+  docker-compose exec -T backend wget --no-verbose -O- http://localhost:3000/health 2>/dev/null | grep -q ok
 "
 echo ""
 
