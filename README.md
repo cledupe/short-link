@@ -124,9 +124,16 @@ PORT=3000
 
 See the `docs/` directory for detailed documentation:
 
+- [API Reference](docs/api.md) — Complete API documentation with request/response examples and error codes
+- [Deployment Guide](docs/deployment.md) — Build, deploy, rolling update, and rollback procedures
+- [Operations Runbook](docs/runbook.md) — Startup sequence, incident response, and alert resolution
+- [Troubleshooting Guide](docs/troubleshooting.md) — Common issues, log checking, and recovery steps
 - [Security Configuration](docs/security.md) — Port mappings, firewall rules, security groups, network isolation
-- [Cassandra Backup & Restore](docs/cassandra-backup.md) — Snapshot procedures, incremental strategy, automated backup/restore scripts
+- [Monitoring & Observability](docs/monitoring.md) — Prometheus metrics, Grafana dashboards, and alert rules
+- [Scalability Guide](docs/scaling.md) — Scaling backend, Cassandra, and Redis
+- [Redis Key Conventions](docs/redis-keys.md) — Key naming, TTL, memory configuration
 - [Cassandra CQL Queries](docs/cassandra-queries.md) — Complete CQL reference with INSERT, SELECT, UPDATE, BATCH, and time-range query examples
+- [Cassandra Backup & Restore](docs/cassandra-backup.md) — Snapshot procedures, incremental strategy, automated backup/restore scripts
 
 ## Scaling
 
