@@ -29,6 +29,7 @@ A high-performance, distributed URL shortening service built with Docker, Cassan
 ├── .env.example            # Environment variables template
 ├── .dockerignore           # Docker build exclusions
 ├── README.md               # This file
+├── DEPENDENCIES.md         # Section dependencies and execution order
 │
 ├── backend/                # Backend Node.js application
 │   ├── package.json        # Dependencies
@@ -41,7 +42,10 @@ A high-performance, distributed URL shortening service built with Docker, Cassan
 │   └── ...                 # Frontend source files
 │
 ├── docs/                   # Documentation
-│   └── security.md         # Security configuration and best practices
+│   ├── security.md         # Security configuration and best practices
+│   ├── scaling.md          # Scaling guide
+│   ├── cassandra-backup.md # Cassandra backup procedures  
+│   └── cassandra-queries.md # Cassandra CQL query examples
 │
 ├── ssl/                    # SSL certificates (not committed)
 │   └── .gitkeep            # Ensures directory exists in repo
