@@ -22,3 +22,11 @@ ON url_shortener.url_mappings (created_at);
 
 CREATE INDEX IF NOT EXISTS idx_url_metadata_created_at
 ON url_shortener.url_metadata (created_at);
+
+CREATE TABLE IF NOT EXISTS url_shortener.visit_analytics (
+    short_id TEXT,
+    visitor_ip TEXT,
+    user_agent TEXT,
+    visited_at TIMESTAMP,
+    PRIMARY KEY (short_id, visited_at)
+);

@@ -78,6 +78,14 @@ async function incrementVisitCount(shortId) {
   );
 }
 
+async function storeVisitAnalytics(shortId, ip, userAgent) {
+  await getClient().execute(
+    'INSERT INTO visit_analytics (short_id, visited_at, visitor_ip, user_agent) VALUES (?, ?, ?, ?)',
+    [shortId, new Date(), ip, userAgent],
+    { prepare: true }
+  );
+}
+
 function isReady() {
   if (!client) return false;
   return true;
@@ -97,6 +105,7 @@ module.exports = {
   insertUrlMapping,
   insertUrlMetadata,
   incrementVisitCount,
+  storeVisitAnalytics,
   isReady,
   shutdown
 };

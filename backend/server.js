@@ -1,6 +1,7 @@
 const express = require('express');
 const healthRouter = require('./src/routes/health');
 const urlsRouter = require('./src/routes/urls');
+const redirectRouter = require('./src/routes/redirect');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,8 +16,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', healthRouter);
+app.use('/health', healthRouter);
+app.use('/ready', healthRouter);
 app.use('/api/v1/urls', urlsRouter);
+
+app.use('/', redirectRouter);
 
 if (require.main === module) {
   app.listen(PORT, () => {

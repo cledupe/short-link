@@ -149,17 +149,17 @@
 
 ## 4. Core - URL Redirection Service (spec: url-redirection)
 
-- [ ] 4.1 Create `GET /:shortId` endpoint for URL redirects
-- [ ] 4.2 Implement Redis cache lookup first (check if mapping exists in cache)
-- [ ] 4.3 On cache miss, query Cassandra `url_mappings` table for the short_id
-- [ ] 4.4 Store retrieved mapping in Redis cache with 24-hour TTL
-- [ ] 4.5 Read original_url directly from Cassandra (no decryption needed)
-- [ ] 4.6 Return 302 redirect response with decrypted URL in Location header
-- [ ] 4.7 Return 404 Not Found for non-existent short_ids
-- [ ] 4.8 Increment visit_count in Cassandra (counter column)
-- [ ] 4.9 Store visit analytics in Cassandra with timestamp
-- [ ] 4.10 Implement concurrent request handling for same short_id
-- [ ] 4.11 Add proper caching headers for browser cache optimization
+- [x] 4.1 Create `GET /:shortId` endpoint for URL redirects
+- [x] 4.2 Implement Redis cache lookup first (check if mapping exists in cache)
+- [x] 4.3 On cache miss, query Cassandra `url_mappings` table for the short_id
+- [x] 4.4 Store retrieved mapping in Redis cache with 24-hour TTL
+- [x] 4.5 Read original_url directly from Cassandra (no decryption needed)
+- [x] 4.6 Return 302 redirect response with URL in Location header
+- [x] 4.7 Return 404 Not Found for non-existent short_ids
+- [x] 4.8 Increment visit_count in Cassandra (counter column)
+- [x] 4.9 Store visit analytics in Cassandra with timestamp
+- [x] 4.10 Implement concurrent request handling for same short_id
+- [x] 4.11 Add proper caching headers for browser cache optimization
 
 ### 4.12 Git - Section 4 Complete (URL Redirection Service)
 - [ ] 4.12.1 Create git branch: `git checkout -b feature/url-redirection-service`
