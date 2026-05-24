@@ -240,3 +240,8 @@ A passing load test ends with:
 ```
 [PASS] Load test completed without server errors
 ```
+
+### screenshot
+
+<img width="559" height="449" alt="Captura de tela 2026-05-24 190911" src="https://github.com/user-attachments/assets/1cd30ae9-8ee2-43cb-9ccc-9424ff9465e7" />
+
