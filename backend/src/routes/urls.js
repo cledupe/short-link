@@ -1,6 +1,6 @@
 const express = require('express');
 const { getNextId, reserveIds } = require('../services/counter');
-const { encode } = require('../utils/base62');
+const base62 = require('base62');
 const cassandra = require('../services/cassandra');
 const cache = require('../services/cache');
 const { createRateLimiter, sanitizeUrl } = require('../middleware/security');
