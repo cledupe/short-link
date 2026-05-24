@@ -169,6 +169,9 @@ test "Rate limit exceeded returns 429" sh -c "
   exit 1
 "
 echo ""
+echo -e "\033[34m[INFO]\033[0m Waiting for rate limit window to reset..."
+sleep 65
+echo ""
 
 # ------------------------------------------------------------------
 # 9.11 - Invalid URL rejection
