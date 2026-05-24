@@ -1,5 +1,5 @@
 const express = require('express');
-const { getClient } = require('../services/redis');
+const cache = require('../services/cache');
 const { findUrlByShortId, incrementVisitCount, storeVisitAnalytics } = require('../services/cassandra');
 
 const pendingFetches = new Map();
@@ -14,8 +14,7 @@ router.get('/:shortId', async (req, res) => {
   }
 
   try {
-    const redis = getClient();
-    let originalUrl = await redis.get(shortId);
+    let originalUrl = await cache.get(shortId);
 
     if (!originalUrl) {
       if (pendingFetches.has(shortId)) {
@@ -33,7 +32,7 @@ router.get('/:shortId', async (req, res) => {
 
         originalUrl = mapping.original_url;
 
-        await redis.setex(shortId, 86400, originalUrl).catch(err => {
+        await cache.set(shortId, originalUrl, 86400).catch(err => {
           console.error(`Failed to cache ${shortId}:`, err.message);
         });
       }

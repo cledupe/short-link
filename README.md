@@ -144,14 +144,14 @@ MIT
 
 ## Testing
 
-Run the local test suite to validate the entire stack:
-
 ### Prerequisites
 
 - Docker and Docker Compose must be installed
 - Ports 8080 (Nginx) and 3000-3002 (Backend) must be free
 
-### Running Tests
+### Local Infrastructure Tests
+
+Run the local test suite to validate container startup, service communication, and basic E2E flow:
 
 **Linux / macOS:**
 ```bash
@@ -164,7 +164,36 @@ chmod +x scripts/test-local.sh
 scripts\test-local.bat
 ```
 
+### E2E Tests (Section 9)
+
+Comprehensive end-to-end tests covering URL creation, redirect, rate limiting, batch creation, invalid input handling, and concurrent access:
+
+```bash
+chmod +x scripts/test-e2e.sh
+./scripts/test-e2e.sh
+```
+
+Configuration:
+- `BASE_URL` environment variable to target a different host (default: `http://localhost:8080`)
+
+### Load Tests
+
+Simple curl-based concurrency test measuring throughput and latency:
+
+```bash
+chmod +x scripts/test-load.sh
+./scripts/test-load.sh
+```
+
+Configuration:
+- `BASE_URL` — target host (default: `http://localhost:8080`)
+- `CONCURRENCY` — parallel requests (default: 10)
+- `TOTAL_REQUESTS` — requests per phase (default: 100)
+- `VERIFY_URL` — pre-created short ID for GET tests (optional, auto-created if empty)
+
 ### Test Descriptions
+
+#### Local Tests (0.7.x)
 
 | Test | Section | Verifies |
 |------|---------|----------|
@@ -178,10 +207,29 @@ scripts\test-local.bat
 | 0.7.8 | Horizontal Scaling | `--scale backend=3` launches 3 instances; all report healthy |
 | 0.7.9 | Log Monitoring | `docker-compose logs -f` shows inter-service communication (manual) |
 
+#### E2E Tests (9.x)
+
+| Test | Section | Verifies |
+|------|---------|----------|
+| 9.1 | Test Environment | Health checks: backend, frontend, Redis, Cassandra connectivity |
+| 9.2 | Create + Redirect | POST `/api/v1/urls` → 201, GET `/:shortId` → 302 with correct Location |
+| 9.3 | Cache Miss | Clear Redis cache, GET still returns 302 (Cassandra fallback) |
+| 9.4 | Concurrent GETs | 5 parallel requests for same shortId all return 302 |
+| 9.6 | Concurrent POSTs | 10 parallel URL creations produce 10 unique shortIds |
+| 9.10 | Rate Limiting | 110 rapid requests; some return 429 |
+| 9.11 | Invalid URLs | Empty body, malformed string, missing scheme, null, non-string all return 400 |
+| 9.12 | Batch Creation | POST `/api/v1/urls/batch` with 5 URLs → 201 with 5 entries; all redirect correctly |
+
 ### Expected Output
 
-All tests print `PASS` or `FAIL` for each section. A passing run ends with:
+All tests print `PASS` or `FAIL` for each section. A passing E2E run ends with:
 
 ```
-[PASS] All 0.7.x tests passed successfully
+[PASS] All tests passed: 19 passed, 0 failed
+```
+
+A passing load test ends with:
+
+```
+[PASS] Load test completed without server errors
 ```

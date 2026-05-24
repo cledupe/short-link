@@ -4,7 +4,12 @@ let client = null;
 
 function createClient() {
   const url = process.env.REDIS_URL || 'redis://redis:6379';
-  const instance = new Redis(url);
+  const instance = new Redis(url, {
+    maxRetriesPerRequest: 3,
+    enableReadyCheck: true,
+    lazyConnect: true,
+    connectionName: 'url-shortener',
+  });
 
   instance.on('connect', () => {
     console.log('[Redis] Connected successfully');

@@ -2,6 +2,7 @@ const express = require('express');
 const { getNextId, reserveIds } = require('../services/counter');
 const { encode } = require('../utils/base62');
 const cassandra = require('../services/cassandra');
+const cache = require('../services/cache');
 
 const router = express.Router();
 
@@ -54,6 +55,9 @@ function isValidUrl(str) {
 async function createShortUrl(originalUrl, ip, userAgent) {
   const existing = await cassandra.findUrlByOriginalUrl(originalUrl);
   if (existing) {
+    cache.set(existing.short_id, existing.original_url).catch(err => {
+      console.error(`[URLS] Failed to cache duplicate ${existing.short_id}:`, err.message);
+    });
     return { shortId: existing.short_id, originalUrl: existing.original_url, isDuplicate: true };
   }
 
@@ -62,6 +66,9 @@ async function createShortUrl(originalUrl, ip, userAgent) {
 
   await cassandra.insertUrlMapping(shortId, originalUrl);
   await cassandra.insertUrlMetadata(shortId, ip, userAgent);
+  cache.set(shortId, originalUrl).catch(err => {
+    console.error(`[URLS] Failed to cache ${shortId}:`, err.message);
+  });
 
   return { shortId, originalUrl, isDuplicate: false };
 }
@@ -127,6 +134,9 @@ router.post('/batch', async (req, res) => {
     for (const url of validUrls) {
       const existing = await cassandra.findUrlByOriginalUrl(url);
       if (existing) {
+        cache.set(existing.short_id, existing.original_url).catch(err => {
+          console.error(`[URLS] Failed to cache duplicate ${existing.short_id}:`, err.message);
+        });
         results.push({
           original_url: url,
           short_url: `${req.protocol}://${req.get('host')}/${existing.short_id}`,
@@ -148,6 +158,9 @@ router.post('/batch', async (req, res) => {
 
         await cassandra.insertUrlMapping(shortId, url);
         await cassandra.insertUrlMetadata(shortId, ip, userAgent);
+        cache.set(shortId, url).catch(err => {
+          console.error(`[URLS] Failed to cache batch ${shortId}:`, err.message);
+        });
 
         results.push({
           original_url: url,
@@ -183,6 +196,28 @@ router.get('/:shortId', async (req, res) => {
     });
   } catch (err) {
     console.error('[URLS] Error fetching URL:', err.message);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.delete('/:shortId', async (req, res) => {
+  const { shortId } = req.params;
+  if (!shortId || !/^[0-9a-zA-Z]{1,10}$/.test(shortId)) {
+    return res.status(400).json({ error: 'Invalid shortId.' });
+  }
+
+  try {
+    const mapping = await cassandra.findUrlByShortId(shortId);
+    if (!mapping) {
+      return res.status(404).json({ error: 'Short URL not found.' });
+    }
+
+    await cache.del(shortId);
+    console.log(`[URLS] Cache invalidated for ${shortId}`);
+
+    return res.status(200).json({ short_id: shortId, message: 'Cache invalidated successfully.' });
+  } catch (err) {
+    console.error(`[URLS] Error invalidating cache for ${shortId}:`, err.message);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

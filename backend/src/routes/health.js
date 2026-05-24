@@ -70,4 +70,9 @@ router.get('/ready', (req, res) => {
   });
 });
 
+router.get('/metrics/cache', (req, res) => {
+  const cache = require('../services/cache');
+  res.status(200).json(cache.getMetrics());
+});
+
 module.exports = router;

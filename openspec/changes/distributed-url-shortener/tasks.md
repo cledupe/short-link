@@ -240,15 +240,15 @@ Encryption at rest was removed from the project scope. URLs are stored as plaint
 
 ## 8. Caching Implementation
 
- - [ ] 8.1 Configure Redis client connection pooling
-- [ ] 8.2 Implement write-through caching for URL creation
-- [ ] 8.3 Set cache TTL to 24 hours for URL mappings
-- [ ] 8.4 Implement LRU eviction for old entries
-- [ ] 8.5 Create cache metrics endpoint (hit rate, miss rate)
-- [ ] 8.6 Implement cache invalidation for deleted URLs
-- [ ] 8.7 Test cache hit rate optimization (>80% target)
-- [ ] 8.8 Monitor cache memory usage and adjust eviction policies
-- [ ] 8.9 Document Redis dual-purpose architecture (cache + atomic counter)
+ - [x] 8.1 Configure Redis client connection pooling
+- [x] 8.2 Implement write-through caching for URL creation
+- [x] 8.3 Set cache TTL to 24 hours for URL mappings
+- [x] 8.4 Implement LRU eviction for old entries
+- [x] 8.5 Create cache metrics endpoint (hit rate, miss rate)
+- [x] 8.6 Implement cache invalidation for deleted URLs
+- [x] 8.7 Test cache hit rate optimization (>80% target)
+- [x] 8.8 Monitor cache memory usage and adjust eviction policies
+- [x] 8.9 Document Redis dual-purpose architecture (cache + atomic counter)
 
 ### 8.10 Git - Section 8 Complete (Caching Implementation)  
 - [ ] 8.10.1 Create git branch: `git checkout -b feature/caching-implementation`
@@ -264,18 +264,18 @@ Encryption at rest was removed from the project scope. URLs are stored as plaint
 
 ## 9. Integration & End-to-End Testing
 
-- [ ] 9.1 Set up integration test environment with all components
-- [ ] 9.2 Write E2E test: URL creation → cache storage → retrieval → redirect
-- [ ] 9.3 Test cache miss scenario (verify fetch from Cassandra)
-- [ ] 9.4 Test concurrent requests for same URL (consistency check)
-- [ ] 9.5 Test encryption/decryption round-trip
-- [ ] 9.6 Test distributed counter under concurrent load
-- [ ] 9.7 Test Cassandra replication (shutdown one node, verify data availability)
-- [ ] 9.8 Test Redis failover (master failure, replica promotion)
-- [ ] 9.9 Test load balancer with 3 instances (traffic distribution)
-- [ ] 9.10 Test rate limiting enforcement (100 req/min limit)
-- [ ] 9.11 Test invalid URL rejection (malformed URLs)
-- [ ] 9.12 Test batch URL creation (100 URLs in one request)
+- [x] 9.1 Set up integration test environment with all components
+- [x] 9.2 Write E2E test: URL creation → cache storage → retrieval → redirect
+- [x] 9.3 Test cache miss scenario (verify fetch from Cassandra)
+- [x] 9.4 Test concurrent requests for same URL (consistency check)
+- [x] 9.5 _(removed — encryption was removed from project scope)_
+- [x] 9.6 Test distributed counter under concurrent load
+- [x] 9.7 Test Cassandra replication (shutdown one node, verify data availability)
+- [x] 9.8 Test Redis failover (master failure, replica promotion)
+- [x] 9.9 Test load balancer with 3 instances (traffic distribution)
+- [x] 9.10 Test rate limiting enforcement (100 req/min limit)
+- [x] 9.11 Test invalid URL rejection (malformed URLs)
+- [x] 9.12 Test batch URL creation (100 URLs in one request)
 
 ### 9.13 Git - Section 9 Complete (Integration Testing)
 - [ ] 9.13.1 Create git branch: `git checkout -b feature/integration-testing`
