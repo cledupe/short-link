@@ -23,8 +23,6 @@ services:
       - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
       # Seed nodes - Docker Compose DNS resolves service name to all container IPs
       - CASSANDRA_SEEDS=cassandra
-      # Broadcast address uses Docker's dynamic hostname for cross-node communication
-      - CASSANDRA_BROADCAST_ADDRESS=$$(hostname -f)
     volumes:
       - cassandra_data:/var/lib/cassandra
     networks:
