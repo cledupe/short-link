@@ -1,12 +1,12 @@
 const { getClient } = require('./redis');
-
-const metrics = { hits: 0, misses: 0, startTime: Date.now() };
+const { observeCacheHit, observeCacheMiss } = require('./metrics');
 
 async function get(shortId) {
   const redis = getClient();
+  const start = Date.now();
   const url = await redis.get(shortId);
-  if (url) metrics.hits++;
-  else metrics.misses++;
+  if (url) observeCacheHit();
+  else observeCacheMiss();
   return url;
 }
 
@@ -20,21 +20,4 @@ async function del(shortId) {
   await redis.del(shortId);
 }
 
-function getMetrics() {
-  const total = metrics.hits + metrics.misses;
-  return {
-    hits: metrics.hits,
-    misses: metrics.misses,
-    total,
-    hitRate: total ? (metrics.hits / total * 100).toFixed(2) + '%' : '0%',
-    uptime: Math.floor((Date.now() - metrics.startTime) / 1000)
-  };
-}
-
-function resetMetrics() {
-  metrics.hits = 0;
-  metrics.misses = 0;
-  metrics.startTime = Date.now();
-}
-
-module.exports = { get, set, del, getMetrics, resetMetrics };
+module.exports = { get, set, del };

@@ -3,6 +3,7 @@ const { getNextId, reserveIds } = require('../services/counter');
 const { encode } = require('../utils/base62');
 const cassandra = require('../services/cassandra');
 const cache = require('../services/cache');
+const { createRateLimiter, sanitizeUrl } = require('../middleware/security');
 
 const router = express.Router();
 
@@ -10,33 +11,7 @@ const RATE_LIMIT_WINDOW = 60 * 1000;
 const RATE_LIMIT_MAX = 100;
 const BATCH_MAX_URLS = 100;
 
-const rateLimitMap = new Map();
-
-function getRateLimitInfo(ip) {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  if (!record || now - record.windowStart > RATE_LIMIT_WINDOW) {
-    const info = { windowStart: now, count: 0 };
-    rateLimitMap.set(ip, info);
-    return info;
-  }
-  return record;
-}
-
-function checkRateLimit(ip) {
-  const info = getRateLimitInfo(ip);
-  info.count++;
-  return info.count <= RATE_LIMIT_MAX;
-}
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of rateLimitMap.entries()) {
-    if (now - record.windowStart > RATE_LIMIT_WINDOW) {
-      rateLimitMap.delete(ip);
-    }
-  }
-}, 60 * 1000);
+const rateLimiter = createRateLimiter(RATE_LIMIT_MAX, RATE_LIMIT_WINDOW);
 
 const URL_REGEX = /^https?:\/\/.+/i;
 
@@ -73,19 +48,17 @@ async function createShortUrl(originalUrl, ip, userAgent) {
   return { shortId, originalUrl, isDuplicate: false };
 }
 
-router.post('/', async (req, res) => {
+router.post('/', rateLimiter, async (req, res) => {
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
-  if (!checkRateLimit(ip)) {
-    return res.status(429).json({ error: 'Rate limit exceeded. Try again later.' });
-  }
 
   const { original_url } = req.body;
-  if (!isValidUrl(original_url)) {
+  const sanitized = sanitizeUrl(original_url);
+  if (!sanitized) {
     return res.status(400).json({ error: 'Invalid URL. Must start with http:// or https:// and be a valid URL.' });
   }
 
   try {
-    const result = await createShortUrl(original_url.trim(), ip, req.headers['user-agent'] || 'unknown');
+    const result = await createShortUrl(sanitized, ip, req.headers['user-agent'] || 'unknown');
     const shortUrl = `${req.protocol}://${req.get('host')}/${result.shortId}`;
 
     if (result.isDuplicate) {
@@ -108,11 +81,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.post('/batch', async (req, res) => {
+router.post('/batch', rateLimiter, async (req, res) => {
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
-  if (!checkRateLimit(ip)) {
-    return res.status(429).json({ error: 'Rate limit exceeded. Try again later.' });
-  }
 
   const { urls } = req.body;
   if (!Array.isArray(urls) || urls.length === 0) {
@@ -122,7 +92,7 @@ router.post('/batch', async (req, res) => {
     return res.status(400).json({ error: `Maximum ${BATCH_MAX_URLS} URLs per batch request.` });
   }
 
-  const validUrls = urls.map(u => (typeof u === 'string' ? u.trim() : '')).filter(isValidUrl);
+  const validUrls = urls.map(u => sanitizeUrl(u)).filter(Boolean);
   if (validUrls.length === 0) {
     return res.status(400).json({ error: 'No valid URLs provided.' });
   }

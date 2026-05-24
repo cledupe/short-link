@@ -151,6 +151,30 @@ services:
       - url_shortener_net
     restart: unless-stopped
 
+  # Prometheus - metrics collection and monitoring
+  # Port: 9090 (Prometheus UI)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+
+  # Grafana - dashboard visualization for Prometheus metrics
+  # Port: 3001 (mapped to container port 3000 to avoid conflict with backend)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - url_shortener_net
+    restart: unless-stopped
+
 networks:
   url_shortener_net:
     driver: bridge

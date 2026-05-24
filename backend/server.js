@@ -2,18 +2,20 @@ const express = require('express');
 const healthRouter = require('./src/routes/health');
 const urlsRouter = require('./src/routes/urls');
 const redirectRouter = require('./src/routes/redirect');
+const { corsMiddleware, securityHeadersMiddleware } = require('./src/middleware/security');
+const { metricsMiddleware, getMetrics } = require('./src/services/metrics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(corsMiddleware);
+app.use(securityHeadersMiddleware);
 app.use(express.json({ limit: '1mb' }));
+app.use(metricsMiddleware);
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - start}ms`);
-  });
-  next();
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.send(await getMetrics());
 });
 
 app.use('/health', healthRouter);
