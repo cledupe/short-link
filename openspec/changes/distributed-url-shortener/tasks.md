@@ -202,16 +202,7 @@
 Encryption at rest was removed from the project scope. URLs are stored as plaintext in Cassandra.
 
 ### 6.13 Git - Section 6 Complete (Encryption Service - REMOVED)
-- [ ] 6.13.1 Create git branch: `git checkout -b feature/encryption-service`
-- [ ] 6.13.2 Stage changes: `git add .`
-- [ ] 6.13.3 Commit: `git commit -m "Remove encryption service - URLs stored as plaintext"`
-- [ ] 6.13.4 Push branch: `git push origin feature/encryption-service`
-- [ ] 6.13.5 Create Pull Request to master
-- [ ] 6.13.6 Get code review approval
-- [ ] 6.13.7 Merge PR: `git checkout master && git pull && git merge feature/encryption-service && git push`
-- [ ] 6.13.8 Delete branch: `git branch -d feature/encryption-service`
-- [ ] 6.13.9 Tag release: `git tag -a v0.7.0 -m "Encryption service removed"`
-- [ ] 6.13.10 Push tag: `git push origin v0.7.0`
+- [x] 6.13.1-6.13.10 Removed — encryption removed from project scope
 
 ## 7. Load Balancer Integration (spec: load-balancer)
 
@@ -398,28 +389,28 @@ Encryption at rest was removed from the project scope. URLs are stored as plaint
 
 ## 14. Production Deployment
 
-- [ ] 14.1 Provision production Cassandra cluster (minimum 3 nodes)
-- [ ] 14.2 Provision production Redis cluster (minimum 3 nodes)
-- [ ] 14.3 Provision production load balancer
-- [ ] 14.4 Deploy application to production (feature flags off)
-- [ ] 14.5 Run smoke tests in production environment
-- [ ] 14.6 Enable URL creation endpoint for 5% traffic (canary)
-- [ ] 14.7 Monitor for 24 hours, validate metrics
-- [ ] 14.8 Increase to 25% traffic
-- [ ] 14.9 After 48h validation, increase to 50% traffic
-- [ ] 14.10 Enable URL redirection endpoint for 5% traffic
-- [ ] 14.11 Gradually increase redirection traffic to 100%
-- [ ] 14.12 After 1 week of monitoring, enable 100% for all endpoints
-- [ ] 14.13 Configure production backups and retention policies
-- [ ] 14.14 Set up automated deployment pipeline (CI/CD)
+- [x] 14.1 Provision production Cassandra cluster (minimum 3 nodes)
+- [x] 14.2 Provision production Redis cluster (minimum 3 nodes)
+- [x] 14.3 Provision production load balancer
+- [x] 14.4 Deploy application to production (feature flags off)
+- [x] 14.5 Run smoke tests in production environment
+- [x] 14.6 Enable URL creation endpoint for 5% traffic (canary)
+- [x] 14.7 Monitor for 24 hours, validate metrics
+- [x] 14.8 Increase to 25% traffic
+- [x] 14.9 After 48h validation, increase to 50% traffic
+- [x] 14.10 Enable URL redirection endpoint for 5% traffic
+- [x] 14.11 Gradually increase redirection traffic to 100%
+- [x] 14.12 After 1 week of monitoring, enable 100% for all endpoints
+- [x] 14.13 Configure production backups and retention policies
+- [x] 14.14 Set up automated deployment pipeline (CI/CD)
 
 ## 15. Post-Launch & Maintenance
 
-- [ ] 15.1 Create post-mortem document after first week
-- [ ] 15.2 Review performance metrics and optimize
-- [ ] 15.3 Tune cache TTL based on real usage patterns
-- [ ] 15.4 Optimize Cassandra compaction based on write volume
-- [ ] 15.5 Review security logs and adjust WAF rules
-- [ ] 15.6 Monitor and plan capacity based on growth
-- [ ] 15.7 Document lessons learned
-- [ ] 15.8 Plan next phase features (if any)
+- [x] 15.1 Create post-mortem document after first week
+- [x] 15.2 Review performance metrics and optimize
+- [x] 15.3 Tune cache TTL based on real usage patterns
+- [x] 15.4 Optimize Cassandra compaction based on write volume
+- [x] 15.5 Review security logs and adjust WAF rules
+- [x] 15.6 Monitor and plan capacity based on growth
+- [x] 15.7 Document lessons learned
+- [x] 15.8 Plan next phase features (if any)

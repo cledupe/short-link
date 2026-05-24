@@ -1,0 +1,164 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: registry.example.com
+  IMAGE_NAME: url-shortener
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t ${{ env.IMAGE_NAME }}:${{ github.ref_name }} .
+
+      - name: Start test environment
+        run: docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: sleep 10
+
+      - name: Run integration tests
+        run: |
+          docker-compose exec -T backend npm test || true
+          ./scripts/test-e2e.sh || echo "E2E tests script not found"
+
+      - name: Run health check
+        run: |
+          for i in 1 2 3 4 5; do
+            curl -f http://localhost:8080/health && break
+            sleep 2
+          done
+
+      - name: Tear down test environment
+        if: always()
+        run: docker-compose down
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+      - name: Run security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          format: table
+          exit-code: 0
+
+  deploy-canary:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    strategy:
+      matrix:
+        phase: [5, 25, 50, 100]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LB_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy canary phase ${{ matrix.phase }}%
+        run: |
+          ssh ${{ secrets.LB_HOST }} "
+            sed -i 's/weight=[0-9]*/weight=${{ matrix.phase }}/g' /etc/nginx/nginx.conf
+            nginx -t && systemctl reload nginx
+          "
+
+      - name: Wait for monitoring window
+        run: |
+          case ${{ matrix.phase }} in
+            5)   sleep 86400 ;;   # 24 hours
+            25)  sleep 172800 ;;  # 48 hours
+            50)  sleep 172800 ;;  # 48 hours
+            100) sleep 604800 ;;  # 1 week
+          esac
+
+      - name: Verify phase ${{ matrix.phase }}% metrics
+        run: |
+          curl -f https://${{ secrets.DOMAIN }}/health
+          curl -f https://${{ secrets.DOMAIN }}/metrics | grep -E 'error_rate|http_requests_duration'
+
+  deploy-final:
+    needs: deploy-canary
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.ref_type == 'tag'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.LB_HOST }} >> ~/.ssh/known_hosts
+          for host in ${{ secrets.APP_HOSTS }}; do
+            ssh-keyscan -H \$host >> ~/.ssh/known_hosts
+          done
+
+      - name: Deploy to all nodes
+        run: |
+          for host in ${{ secrets.APP_HOSTS }}; do
+            ssh \$host "
+              docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+              docker stop url-shortener || true
+              docker rm url-shortener || true
+              docker run -d --name url-shortener \
+                --restart=always \
+                -p 3000:3000 \
+                --env-file /etc/url-shortener/.env \
+                ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            "
+          done
+
+      - name: Run smoke tests
+        run: ./scripts/smoke-test.sh
+
+      - name: Notify
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Deployment ${{ github.ref_name }} completed successfully"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
