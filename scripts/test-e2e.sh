@@ -10,10 +10,10 @@ test() {
   local name="$1"; shift
   if "$@"; then
     echo -e "\033[32m[PASS]\033[0m $name"
-    ((PASS++))
+    PASS=$((PASS + 1))
   else
     echo -e "\033[31m[FAIL]\033[0m $name"
-    ((FAIL++))
+    FAIL=$((FAIL + 1))
     FAILED_TESTS="$FAILED_TESTS  - $name\n"
   fi
 }
