@@ -44,7 +44,7 @@ async function checkCassandra(timeout) {
   }
 }
 
-router.get('/health', async (req, res) => {
+router.get('/', async (req, res) => {
   const TIMEOUT = 500;
   const [redisResult, cassandraResult] = await Promise.all([
     checkRedis(TIMEOUT),
